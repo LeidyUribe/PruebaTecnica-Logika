@@ -40,7 +40,7 @@ export interface Action {
 
 export interface CreateActionRequest {
   name: string; // El API espera 'name', no 'title'
-  description?: string;
+  description: string; // Requerido por el API (NotBlank)
   color: string; // Requerido por el API
   status: number; // Requerido por el API (Integer)
   icon: File; // Requerido por el API (MultipartFile)

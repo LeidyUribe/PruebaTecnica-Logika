@@ -1,10 +1,3 @@
-/**
- * Página de Login
- * Maneja la autenticación del usuario
- * 
- * Principio: Separation of Concerns - La página solo orquesta, la lógica está en hooks
- */
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -14,15 +7,6 @@ import { Button } from '@/components/common/Button';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { ROUTES, MESSAGES } from '@/constants';
 
-/**
- * Página de inicio de sesión
- * 
- * Características:
- * - Validación de formulario con React Hook Form
- * - Manejo de estados: loading, error, success
- * - Redirección automática si ya está autenticado
- * - Redirección al dashboard después del login exitoso
- */
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,14 +18,13 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginRequest>({
-    mode: 'onBlur', // Validar al perder el foco, no en cada cambio
+    mode: 'onBlur',
     defaultValues: {
       username: '',
       password: '',
     },
   });
 
-  // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname || ROUTES.DASHBOARD;
@@ -49,30 +32,22 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate, location]);
 
-  // Limpiar error cuando el componente se monta
   useEffect(() => {
     clearError();
   }, [clearError]);
 
-  /**
-   * Maneja el submit del formulario
-   */
   const onSubmit = async (data: LoginRequest) => {
     try {
       await login(data);
-      // Navegar después de login exitoso
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname || ROUTES.DASHBOARD;
       navigate(from, { replace: true });
     } catch (err) {
-      // El error ya está manejado en el hook useAuth y se muestra en el estado error
-      console.error('Login error:', err);
-      // No necesitamos hacer nada más, el error ya se muestra en el UI
+      // El error ya está manejado en el hook useAuth
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Formas decorativas de fondo */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-200 rounded-full opacity-30 blur-3xl"></div>
         <div className="absolute top-40 right-20 w-80 h-80 bg-pink-200 rounded-full opacity-30 blur-3xl"></div>
@@ -81,16 +56,12 @@ const Login: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-100 rounded-full opacity-20 blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
       </div>
 
-      {/* Card de login */}
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
-          {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex justify-center items-center mb-4">
-              {/* Icono abstracto de dos 'b' entrelazadas */}
               <div className="relative w-20 h-20">
                 <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Primera 'b' en azul claro */}
                   <path 
                     d="M20 20C20 15.5817 23.5817 12 28 12H32C36.4183 12 40 15.5817 40 20V28C40 32.4183 36.4183 36 32 36H28C23.5817 36 20 32.4183 20 28V20Z" 
                     fill="#60A5FA" 
@@ -101,7 +72,6 @@ const Login: React.FC = () => {
                     fill="#60A5FA" 
                     opacity="0.9"
                   />
-                  {/* Segunda 'b' en verde claro, entrelazada */}
                   <path 
                     d="M40 20C40 15.5817 43.5817 12 48 12H52C56.4183 12 60 15.5817 60 20V28C60 32.4183 56.4183 36 52 36H48C43.5817 36 40 32.4183 40 28V20Z" 
                     fill="#34D399" 
@@ -124,13 +94,11 @@ const Login: React.FC = () => {
             <div className="text-blue-600 text-base font-medium">network</div>
           </div>
 
-          {/* Headline */}
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 leading-tight">
             ¡Empieza a conectar tu comunidad ante buenas acciones!
           </h1>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Campo Email */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                 Correo Electrónico*
@@ -159,7 +127,6 @@ const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Campo Contraseña */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Contraseña*
@@ -208,19 +175,16 @@ const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Link Recuperar contraseña */}
             <div className="flex justify-end">
               <a href="#" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
                 Recuperar contraseña
               </a>
             </div>
 
-            {/* Mensaje de error */}
             {error && (
               <ErrorMessage message={error} />
             )}
 
-            {/* Botón Ingresar */}
             <div>
               <button
                 type="submit"

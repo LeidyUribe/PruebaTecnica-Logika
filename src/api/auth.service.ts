@@ -15,25 +15,18 @@ import { LoginRequest, LoginResponse } from '@/types';
  */
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
   try {
-    console.log('Intentando login con:', { username: credentials.username, password: '***' });
     const response = await authApi.post<string | { token: string }>(
       API_ENDPOINTS.AUTH.LOGIN,
       credentials
     );
-    console.log('Respuesta del login:', response.data);
     
-    // El API puede retornar el token directamente como string o como objeto
-    // Normalizar la respuesta para que siempre sea un objeto con token
     const data = response.data;
     if (typeof data === 'string') {
-      // Si es un string, es el token directamente
       return { token: data };
     }
     
     return data;
   } catch (error) {
-    console.error('Error en login:', error);
-    // El error ya fue formateado por el interceptor
     throw error;
   }
 };

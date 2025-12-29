@@ -60,8 +60,6 @@ export const useActions = (): UseActionsReturn => {
       };
 
       const response: ActionsListResponse = await actionsService.getActionsList(paginationParams);
-      
-      // Asegurar que data sea siempre un array
       const actionsArray = Array.isArray(response.data) ? response.data : [];
       
       setActions(actionsArray);
@@ -101,7 +99,7 @@ export const useActions = (): UseActionsReturn => {
       const errorMessage = apiError.message || MESSAGES.ACTIONS.CREATE_ERROR;
       setError(errorMessage);
       toast.error(errorMessage);
-      throw err; // Re-lanzar para que el componente pueda manejar el error
+      throw err;
     } finally {
       setIsLoading(false);
     }
