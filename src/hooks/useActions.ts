@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { actionsService } from '@/api/actions.service';
 import { Action, CreateActionRequest, ActionsListResponse, PaginationParams, ApiError } from '@/types';
 import { PAGINATION, MESSAGES } from '@/constants';
@@ -78,6 +79,7 @@ export const useActions = (): UseActionsReturn => {
       setError(errorMessage);
       setActions([]);
       setPagination(null);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -92,11 +94,13 @@ export const useActions = (): UseActionsReturn => {
 
     try {
       const newAction = await actionsService.createAction(actionData);
+      toast.success(MESSAGES.ACTIONS.CREATE_SUCCESS);
       return newAction;
     } catch (err) {
       const apiError = err as ApiError;
       const errorMessage = apiError.message || MESSAGES.ACTIONS.CREATE_ERROR;
       setError(errorMessage);
+      toast.error(errorMessage);
       throw err; // Re-lanzar para que el componente pueda manejar el error
     } finally {
       setIsLoading(false);

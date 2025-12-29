@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { authService } from '@/api/auth.service';
 import { setAuthToken, removeAuthToken, getAuthToken } from '@/utils/storage';
 import { LoginRequest, ApiError } from '@/types';
@@ -60,15 +61,19 @@ export const useAuth = (): UseAuthReturn => {
       if (token && typeof token === 'string') {
         setAuthToken(token);
         setIsAuthenticated(true);
+        toast.success(MESSAGES.LOGIN.SUCCESS);
       } else {
         console.error('Respuesta del API:', response);
-        throw new Error('Token no recibido en la respuesta del servidor');
+        const errorMsg = 'Token no recibido en la respuesta del servidor';
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
       }
     } catch (err) {
       const apiError = err as ApiError;
       const errorMessage = apiError.message || MESSAGES.LOGIN.ERROR;
       setError(errorMessage);
       setIsAuthenticated(false);
+      toast.error(errorMessage);
       throw err; // Re-lanzar para que el componente pueda manejar el error
     } finally {
       setIsLoading(false);
@@ -82,6 +87,7 @@ export const useAuth = (): UseAuthReturn => {
     removeAuthToken();
     setIsAuthenticated(false);
     setError(null);
+    toast.success('Sesión cerrada exitosamente');
   }, []);
 
   /**
