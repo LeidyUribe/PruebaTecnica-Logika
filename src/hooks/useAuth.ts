@@ -35,13 +35,9 @@ export const useAuth = (): UseAuthReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Verificar si hay token al inicializar
     return !!getAuthToken();
   });
 
-  /**
-   * Realiza el login del usuario
-   */
   const login = useCallback(async (credentials: LoginRequest): Promise<void> => {
     setIsLoading(true);
     setError(null);
@@ -49,8 +45,6 @@ export const useAuth = (): UseAuthReturn => {
     try {
       const response = await authService.login(credentials);
       
-      // El API puede retornar el token directamente como string o como objeto
-      // Extraer el token de la respuesta normalizada
       const token = typeof response === 'string' 
         ? response 
         : response.token || 
@@ -63,7 +57,6 @@ export const useAuth = (): UseAuthReturn => {
         setIsAuthenticated(true);
         toast.success(MESSAGES.LOGIN.SUCCESS);
       } else {
-        console.error('Respuesta del API:', response);
         const errorMsg = 'Token no recibido en la respuesta del servidor';
         toast.error(errorMsg);
         throw new Error(errorMsg);
@@ -74,15 +67,12 @@ export const useAuth = (): UseAuthReturn => {
       setError(errorMessage);
       setIsAuthenticated(false);
       toast.error(errorMessage);
-      throw err; // Re-lanzar para que el componente pueda manejar el error
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  /**
-   * Cierra la sesión del usuario
-   */
   const logout = useCallback(() => {
     removeAuthToken();
     setIsAuthenticated(false);
@@ -90,9 +80,6 @@ export const useAuth = (): UseAuthReturn => {
     toast.success('Sesión cerrada exitosamente');
   }, []);
 
-  /**
-   * Limpia el error actual
-   */
   const clearError = useCallback(() => {
     setError(null);
   }, []);
