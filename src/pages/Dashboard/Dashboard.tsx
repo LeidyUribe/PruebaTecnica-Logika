@@ -1,11 +1,4 @@
-/**
- * Página Dashboard
- * Muestra el listado paginado de acciones
- * 
- * Principio: Separation of Concerns - La página orquesta, la lógica está en hooks
- */
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/context/AuthContext';
 import { useActions } from '@/hooks/useActions';
@@ -14,69 +7,57 @@ import { Pagination } from '@/components/dashboard/Pagination';
 import { Button } from '@/components/common/Button';
 import { PAGINATION, ROUTES } from '@/constants';
 
-/**
- * Página principal del dashboard
- * 
- * Características:
- * - Listado paginado de acciones
- * - Navegación entre páginas
- * - Botón para crear nueva acción
- * - Botón de logout
- * - Manejo de estados: loading, error, empty
- */
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuthContext();
   const { actions, pagination, isLoading, error, fetchActions } = useActions();
   const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE_NUMBER);
+  const isInitialMount = useRef(true);
 
-  // Cargar acciones al montar el componente y cuando cambie la página
   useEffect(() => {
     fetchActions({
       pageNumber: currentPage,
       pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
     });
-  }, [currentPage, fetchActions]);
+  }, [currentPage]);
 
-  // Si venimos de crear una acción, recargar la lista
+  useEffect(() => {
+    if (pagination && isInitialMount.current) {
+      const apiPageNumber = pagination.pageNumber;
+      const normalizedPage = apiPageNumber === 0 ? 1 : Math.max(1, apiPageNumber);
+      if (normalizedPage !== currentPage) {
+        setCurrentPage(normalizedPage);
+      }
+      isInitialMount.current = false;
+    }
+  }, [pagination?.pageNumber]);
+
   useEffect(() => {
     if (location.state && (location.state as { refresh?: boolean }).refresh) {
-      // Limpiar el state para evitar recargas infinitas
       navigate(location.pathname, { replace: true, state: {} });
-      // Recargar acciones
       fetchActions({
         pageNumber: currentPage,
         pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
       });
     }
-  }, [location.state, navigate, location.pathname, currentPage, fetchActions]);
+  }, [location.state]);
 
-  /**
-   * Maneja el cambio de página
-   */
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setCurrentPage(Math.max(1, page));
   };
 
-  /**
-   * Maneja el logout
-   */
   const handleLogout = () => {
     logout();
     navigate(ROUTES.LOGIN, { replace: true });
   };
 
-  /**
-   * Navega al formulario de crear acción
-   */
   const handleCreateAction = () => {
     navigate('/dashboard/create-action');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
@@ -93,7 +74,6 @@ const Dashboard: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -108,7 +88,7 @@ const Dashboard: React.FC = () => {
 
           {pagination && (
             <Pagination
-              currentPage={pagination.pageNumber}
+              currentPage={currentPage}
               totalPages={pagination.totalPages}
               hasPreviousPage={pagination.hasPreviousPage}
               hasNextPage={pagination.hasNextPage}

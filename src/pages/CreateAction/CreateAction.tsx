@@ -1,10 +1,3 @@
-/**
- * Página CreateAction
- * Formulario para crear una nueva acción
- * 
- * Principio: Separation of Concerns - La página orquesta, la lógica está en hooks
- */
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -16,15 +9,6 @@ import { Button } from '@/components/common/Button';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { MESSAGES, VALIDATION } from '@/constants';
 
-/**
- * Página para crear una nueva acción
- * 
- * Características:
- * - Formulario con validaciones
- * - Manejo de estados: loading, error, success
- * - Redirección al dashboard después de crear exitosamente
- * - Refresh del listado al volver
- */
 const CreateAction: React.FC = () => {
   const navigate = useNavigate();
   const { createAction, isLoading, error, clearError } = useActions();
@@ -36,84 +20,74 @@ const CreateAction: React.FC = () => {
     formState: { errors },
     reset,
     setValue,
-    watch,
+    setError,
+    clearErrors,
   } = useForm<CreateActionRequest>({
     defaultValues: {
       name: '',
       description: '',
-      color: '#3B82F6', // Color por defecto (azul)
-      status: 1, // Status por defecto (1 = Activo, válido según API)
+      color: '#3B82F6',
+      status: 1,
     },
   });
 
-  // Observar cambios en los campos para mostrar previews
-  const selectedColor = watch('color');
-  const iconValue = watch('icon');
 
-  // Limpiar error cuando el componente se monta
   useEffect(() => {
     clearError();
   }, [clearError]);
 
-  /**
-   * Maneja el cambio del archivo icon
-   */
   const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setIconFile(file);
-      setValue('icon', file, { shouldValidate: true });
+      setValue('icon', file, { shouldValidate: true, shouldDirty: true });
+      clearErrors('icon');
+    } else {
+      setIconFile(null);
+      setValue('icon', undefined, { shouldValidate: false });
     }
   };
 
-  /**
-   * Maneja el submit del formulario
-   */
   const onSubmit = async (data: CreateActionRequest) => {
+    if (!iconFile) {
+      setError('icon', {
+        type: 'required',
+        message: 'El icono es requerido',
+      });
+      toast.error('Por favor selecciona un archivo icon');
+      return;
+    }
+    
     try {
-      // Asegurar que el archivo icon esté incluido
-      if (!iconFile) {
-        toast.error('Por favor selecciona un archivo icon');
-        return;
-      }
-      
       const formData: CreateActionRequest = {
         name: data.name,
-        description: data.description || '',
+        description: data.description,
         color: data.color,
-        status: Number(data.status), // Asegurar que sea número
+        status: Number(data.status),
         icon: iconFile,
       };
       
       await createAction(formData);
-      // Resetear formulario
       reset();
       setIconFile(null);
-      // Redirigir al dashboard con un parámetro para forzar refresh
       navigate('/dashboard', { replace: true, state: { refresh: true } });
     } catch (err) {
-      // El error ya está manejado en el hook useActions
-      console.error('Create action error:', err);
+      // Error manejado en el hook
     }
   };
 
-  /**
-   * Maneja la cancelación
-   */
   const handleCancel = () => {
     navigate('/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-2xl font-bold text-gray-900">Crear Nueva Acción</h1>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -135,14 +109,17 @@ const CreateAction: React.FC = () => {
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Descripción
+                Descripción *
               </label>
               <textarea
                 id="description"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingresa la descripción de la acción (opcional)"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-colors ${
+                  errors.description ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                }`}
+                placeholder="Ingresa la descripción de la acción"
                 {...register('description', {
+                  required: 'La descripción es requerida',
                   maxLength: {
                     value: VALIDATION.MAX_DESCRIPTION_LENGTH,
                     message: MESSAGES.ACTIONS.DESCRIPTION_TOO_LONG,
@@ -175,7 +152,7 @@ const CreateAction: React.FC = () => {
 
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-                Estado * (0 o 1)
+                Estado *
               </label>
               <select
                 id="status"
@@ -186,30 +163,30 @@ const CreateAction: React.FC = () => {
                   validate: (value) => {
                     const numValue = Number(value);
                     if (numValue !== 0 && numValue !== 1) {
-                      return 'El estado debe ser 0 o 1';
+                      return 'El estado debe ser Inactivo o Activo';
                     }
                     return true;
                   },
                 })}
               >
                 <option value="">Selecciona un estado</option>
-                <option value="0">0 - Inactivo</option>
-                <option value="1">1 - Activo</option>
+                <option value="0">Inactivo</option>
+                <option value="1">Activo</option>
               </select>
               {errors.status && (
                 <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
               )}
             </div>
 
-            {/* Campo Icon (archivo requerido) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Icono * (Archivo)
               </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+              <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors ${
+                errors.icon && !iconFile ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}>
                 <div className="space-y-2 text-center w-full">
                   {iconFile ? (
-                    // Mostrar información del archivo seleccionado
                     <div className="space-y-2">
                       <div className="flex items-center justify-center">
                         <svg
@@ -237,18 +214,11 @@ const CreateAction: React.FC = () => {
                           Tamaño: {(iconFile.size / 1024).toFixed(2)} KB
                         </p>
                       </div>
-                      <label className="inline-block text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">
+                      <label htmlFor="icon-file" className="inline-block text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">
                         Cambiar archivo
-                        <input
-                          type="file"
-                          className="sr-only"
-                          accept="image/*"
-                          onChange={handleIconChange}
-                        />
                       </label>
                     </div>
                   ) : (
-                    // Mostrar área de carga
                     <div className="space-y-1">
                       <svg
                         className="mx-auto h-12 w-12 text-gray-400"
@@ -265,21 +235,22 @@ const CreateAction: React.FC = () => {
                         />
                       </svg>
                       <div className="flex text-sm text-gray-600 justify-center">
-                        <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                        <label htmlFor="icon-file" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
                           <span>Subir archivo</span>
-                          <input
-                            type="file"
-                            className="sr-only"
-                            accept="image/*"
-                            onChange={handleIconChange}
-                          />
                         </label>
                         <p className="pl-1">o arrastra y suelta</p>
                       </div>
                       <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
                     </div>
                   )}
-                  {errors.icon && (
+                  <input
+                    id="icon-file"
+                    type="file"
+                    className="sr-only"
+                    accept="image/*"
+                    onChange={handleIconChange}
+                  />
+                  {errors.icon && !iconFile && (
                     <p className="text-xs text-red-600 mt-2">{errors.icon.message}</p>
                   )}
                 </div>

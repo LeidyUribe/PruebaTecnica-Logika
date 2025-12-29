@@ -33,10 +33,8 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   isLoading,
   error,
 }) => {
-  // Asegurar que actions sea siempre un array
   const safeActions = Array.isArray(actions) ? actions : [];
 
-  // Estado de carga
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -45,12 +43,10 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     );
   }
 
-  // Estado de error
   if (error) {
     return <ErrorMessage message={error} />;
   }
 
-  // Estado vacío
   if (safeActions.length === 0) {
     return (
       <div className="text-center py-12">
@@ -59,7 +55,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     );
   }
 
-  // Tabla con datos
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white border border-gray-200 rounded-lg">
@@ -69,7 +64,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
               ID
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-              Título
+              Nombre
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
               Descripción
@@ -84,19 +79,13 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {safeActions.map((action) => {
-            // Obtener el nombre/título de la acción (priorizar 'name' sobre 'title')
             const actionName = action.name || action.title || 'Sin título';
-            
-            // Obtener la descripción
             const description = action.description || 'Sin descripción';
-            
-             // Obtener el estado (puede ser string o número)
-             const status = action.status !== undefined && action.status !== null 
-               ? String(action.status) 
-               : 'N/A';
+            const status = action.status !== undefined && action.status !== null 
+              ? String(action.status) 
+              : 'N/A';
              
-             // Formatear la fecha de creación
-             const formatDate = (dateString?: string): string => {
+            const formatDate = (dateString?: string): string => {
                if (!dateString) return 'N/A';
                try {
                  const date = new Date(dateString);
@@ -111,34 +100,27 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                }
              };
              
-             // Determinar el estilo del badge de estado según su valor
-             const getStatusBadgeClass = (status: string): string => {
-               const baseClass = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full';
-               
-               // Si es N/A o valores inválidos
-               if (status === 'N/A' || status === 'null' || status === 'undefined' || status === '') {
-                 return `${baseClass} bg-gray-100 text-gray-600`;
-               }
-               
-               // Convertir a número para comparar
-               const statusNum = Number(status);
-               
-               // Si es 1 (Activo) - Verde
-               if (statusNum === 1) {
-                 return `${baseClass} bg-green-100 text-green-800`;
-               }
-               
-               // Si es 0 (Inactivo) - Gris
-               if (statusNum === 0) {
-                 return `${baseClass} bg-gray-100 text-gray-600`;
-               }
-               
-               // Para otros valores numéricos o strings, usar azul por defecto
-               return `${baseClass} bg-blue-100 text-blue-800`;
-             };
+            const getStatusBadgeClass = (status: string): string => {
+              const baseClass = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full';
+              
+              if (status === 'N/A' || status === 'null' || status === 'undefined' || status === '') {
+                return `${baseClass} bg-gray-100 text-gray-600`;
+              }
+              
+              const statusNum = Number(status);
+              
+              if (statusNum === 1) {
+                return `${baseClass} bg-green-100 text-green-800`;
+              }
+              
+              if (statusNum === 0) {
+                return `${baseClass} bg-gray-100 text-gray-600`;
+              }
+              
+              return `${baseClass} bg-blue-100 text-blue-800`;
+            };
              
-             // Obtener el texto del estado con etiqueta
-             const getStatusText = (status: string): string => {
+            const getStatusText = (status: string): string => {
                if (status === 'N/A' || status === 'null' || status === 'undefined' || status === '') {
                  return 'N/A';
                }
