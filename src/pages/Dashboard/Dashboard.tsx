@@ -4,6 +4,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useActions } from '@/hooks/useActions';
 import { ActionsTable } from '@/components/dashboard/ActionsTable';
 import { Pagination } from '@/components/dashboard/Pagination';
+import { CreateActionModal } from '@/components/dashboard/CreateActionModal';
 import { Button } from '@/components/common/Button';
 import { PAGINATION, ROUTES } from '@/constants';
 
@@ -13,6 +14,7 @@ const Dashboard: React.FC = () => {
   const { logout } = useAuthContext();
   const { actions, pagination, isLoading, error, fetchActions } = useActions();
   const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE_NUMBER);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const isInitialMount = useRef(true);
 
   useEffect(() => {
@@ -53,7 +55,18 @@ const Dashboard: React.FC = () => {
   };
 
   const handleCreateAction = () => {
-    navigate('/dashboard/create-action');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCreateSuccess = () => {
+    fetchActions({
+      pageNumber: currentPage,
+      pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+    });
   };
 
   return (
@@ -98,6 +111,12 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </main>
+
+      <CreateActionModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseModal}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   );
 };

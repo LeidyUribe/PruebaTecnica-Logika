@@ -5,7 +5,6 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
-import { CreateAction } from '@/pages/CreateAction';
 import { ROUTES } from '@/constants';
 
 const App: React.FC = () => {
@@ -20,14 +19,6 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/create-action"
-            element={
-              <ProtectedRoute>
-                <CreateAction />
               </ProtectedRoute>
             }
           />
