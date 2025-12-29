@@ -27,9 +27,11 @@ export interface User {
 // ==================== ACTIONS ====================
 export interface Action {
   id: string;
-  title: string;
+  name?: string; // Nombre de la acción (el API usa 'name' en lugar de 'title')
+  title?: string; // Mantener por compatibilidad
   description?: string;
-  status?: string;
+  status?: string | number; // Estado puede ser string o número
+  color?: string; // Color de la acción
   createdAt?: string;
   updatedAt?: string;
   // Agregar otros campos según la respuesta del API
