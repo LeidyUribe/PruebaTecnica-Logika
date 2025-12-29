@@ -6,9 +6,12 @@ Aplicación React 18 con TypeScript que implementa un sistema de autenticación 
 
 - ✅ **Login con token** - Autenticación mediante API REST
 - ✅ **Dashboard con listado paginado** - Visualización de acciones con paginación funcional
-- ✅ **Formulario de creación** - Crear nuevas acciones con validaciones
+- ✅ **Modal de creación** - Crear nuevas acciones mediante modal con validaciones
+- ✅ **Switch toggle** - Estado activo/inactivo con toggle switch
+- ✅ **Upload de archivos** - Campo para subir icono con preview
 - ✅ **Rutas protegidas** - Protección de rutas privadas
 - ✅ **Manejo de estados** - Loading, error y empty states
+- ✅ **Notificaciones toast** - Feedback visual con react-hot-toast
 - ✅ **TypeScript** - Tipado fuerte en toda la aplicación
 - ✅ **Clean Architecture** - Separación de responsabilidades y código modular
 
@@ -87,8 +90,21 @@ src/
 │   └── useActions.ts       # Hook de acciones
 ├── pages/                  # Páginas de la aplicación
 │   ├── Login/              # Página de login
-│   ├── Dashboard/          # Página principal del dashboard
-│   └── CreateAction/       # Página de crear acción
+│   └── Dashboard/          # Página principal del dashboard
+├── components/             # Componentes reutilizables
+│   ├── common/             # Componentes comunes
+│   │   ├── Button/         # Botón reutilizable
+│   │   ├── Input/          # Input con validación
+│   │   ├── LoadingSpinner/ # Spinner de carga
+│   │   ├── ErrorMessage/   # Mensaje de error
+│   │   ├── Modal/          # Modal reutilizable
+│   │   └── Switch/         # Toggle switch
+│   ├── dashboard/          # Componentes del dashboard
+│   │   ├── ActionsTable/   # Tabla de acciones
+│   │   ├── Pagination/     # Paginación
+│   │   └── CreateActionModal/ # Modal de crear acción
+│   └── routes/             # Componentes de rutas
+│       └── ProtectedRoute/ # Ruta protegida
 ├── types/                  # Definiciones de tipos TypeScript
 │   └── index.ts            # Tipos globales
 ├── utils/                  # Utilidades

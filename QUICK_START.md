@@ -46,13 +46,12 @@ src/
 │   ├── auth.service.ts
 │   └── actions.service.ts
 ├── components/       → Componentes reutilizables
-│   ├── common/       → Button, Input, LoadingSpinner, ErrorMessage
-│   ├── dashboard/    → ActionsTable, Pagination
+│   ├── common/       → Button, Input, LoadingSpinner, ErrorMessage, Modal, Switch
+│   ├── dashboard/    → ActionsTable, Pagination, CreateActionModal
 │   └── routes/       → ProtectedRoute
 ├── pages/            → Páginas principales
 │   ├── Login/
-│   ├── Dashboard/
-│   └── CreateAction/
+│   └── Dashboard/
 ├── hooks/            → Custom hooks
 │   ├── useAuth.ts
 │   └── useActions.ts
@@ -70,7 +69,7 @@ src/
 
 - `/login` - Página de inicio de sesión
 - `/dashboard` - Listado de acciones (protegida)
-- `/dashboard/create-action` - Crear nueva acción (protegida)
+  - El botón "Crear Acción" abre un modal para crear nuevas acciones
 
 ## 🛠️ Scripts Disponibles
 
@@ -98,8 +97,10 @@ Para más detalles, consulta:
 
 ✅ **Login con token** - Autenticación mediante API REST  
 ✅ **Dashboard con paginación** - Listado de acciones con navegación  
-✅ **Crear acción** - Formulario completo con validaciones  
+✅ **Modal de creación** - Crear acciones mediante modal (no página separada)  
+✅ **Switch toggle** - Estado activo/inactivo con toggle switch visual  
 ✅ **Upload de archivos** - Campo icon con preview y validación  
+✅ **Color picker** - Selector visual de color  
 ✅ **Rutas protegidas** - Protección automática de rutas privadas  
 ✅ **Manejo de estados** - Loading, error y empty states  
 ✅ **Notificaciones toast** - Feedback visual con react-hot-toast  
